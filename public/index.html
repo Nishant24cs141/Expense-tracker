@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Tracker | Professional Mini Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+            <path d="M6 15h2"></path>
+            <circle cx="16" cy="15" r="1.5"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1>Smart Expense Tracker</h1>
+          <p class="subtitle">Personal Finance & Budget Dashboard</p>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <span class="date-badge" id="currentDate">Mon, 21 Sep</span>
+        <span class="db-badge" id="dbStatusBadge">
+          <span class="status-dot"></span>
+          <span id="dbStatusText">Checking DB...</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- KPI Summary Cards -->
+    <section class="kpi-grid">
+      <!-- Total Income -->
+      <div class="kpi-card income-card">
+        <div class="kpi-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total Income</span>
+          <h2 class="kpi-value" id="totalIncomeDisplay">₹0.00</h2>
+          <span class="kpi-subtext" id="incomeCountText">0 transactions</span>
+        </div>
+      </div>
+
+      <!-- Total Expense -->
+      <div class="kpi-card expense-card">
+        <div class="kpi-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total Expense</span>
+          <h2 class="kpi-value" id="totalExpenseDisplay">₹0.00</h2>
+          <span class="kpi-subtext" id="expenseCountText">0 transactions</span>
+        </div>
+      </div>
+
+      <!-- Net Balance -->
+      <div class="kpi-card balance-card">
+        <div class="kpi-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+            <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Net Balance</span>
+          <h2 class="kpi-value" id="totalBalanceDisplay">₹0.00</h2>
+          <span class="kpi-pill" id="balanceStatusPill">Balanced</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace: Form & Chart Grid -->
+    <main class="dashboard-layout">
+      <!-- Left: Add Transaction Form -->
+      <section class="card form-card">
+        <div class="card-header">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Add New Transaction
+          </h3>
+        </div>
+
+        <form id="transactionForm" class="transaction-form">
+          <!-- Type Segment Selector -->
+          <div class="form-group">
+            <label class="form-label">Transaction Type</label>
+            <div class="type-segmented-control">
+              <label class="type-option active" id="typeExpenseLabel">
+                <input type="radio" name="txType" value="expense" checked />
+                <span>💸 Expense</span>
+              </label>
+              <label class="type-option" id="typeIncomeLabel">
+                <input type="radio" name="txType" value="income" />
+                <span>💰 Income</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label for="txCategory" class="form-label">Category</label>
+            <div class="input-with-icon">
+              <select id="txCategory" required>
+                <!-- Dynamically populated based on type -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Amount -->
+          <div class="form-group">
+            <label for="txAmount" class="form-label">Amount (₹)</label>
+            <div class="input-with-icon">
+              <span class="input-symbol">₹</span>
+              <input type="number" id="txAmount" placeholder="0.00" min="0.01" step="0.01" required />
+            </div>
+          </div>
+
+          <!-- Date -->
+          <div class="form-group">
+            <label for="txDate" class="form-label">Date</label>
+            <input type="date" id="txDate" required />
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="txDescription" class="form-label">Description (Optional)</label>
+            <input type="text" id="txDescription" placeholder="e.g., Grocery shopping, Salary, Client payment" maxlength="100" />
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <span class="btn-text">Save Transaction</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </form>
+      </section>
+
+      <!-- Right: Income vs Expense Chart -->
+      <section class="card chart-card">
+        <div class="card-header space-between">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            Financial Overview
+          </h3>
+          <div class="chart-toggles">
+            <button type="button" class="toggle-btn active" id="btnChartDoughnut">Donut</button>
+            <button type="button" class="toggle-btn" id="btnChartBar">Bar</button>
+          </div>
+        </div>
+
+        <div class="chart-wrapper">
+          <canvas id="expenseChart"></canvas>
+          <div class="chart-empty-state" id="chartEmptyState" style="display: none;">
+            <p>📊 No transaction data yet.</p>
+            <span>Add income or expenses to see the breakdown.</span>
+          </div>
+        </div>
+
+        <!-- Quick Summary Bar -->
+        <div class="chart-footer-metrics">
+          <div class="metric-item">
+            <span class="metric-title">Savings Rate</span>
+            <span class="metric-data" id="savingsRateVal">0%</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-title">Top Expense Category</span>
+            <span class="metric-data" id="topCategoryVal">None</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom: Transaction History Table/List -->
+    <section class="card history-card">
+      <div class="card-header space-between flex-wrap">
+        <div>
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Transaction History
+          </h3>
+          <p class="section-desc">Manage, search and filter your records</p>
+        </div>
+
+        <!-- Filter and Search Controls -->
+        <div class="filter-controls">
+          <div class="search-input-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search description..." />
+          </div>
+
+          <div class="history-filter-tabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="income">Income</button>
+            <button class="filter-tab" data-filter="expense">Expenses</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="table-responsive">
+        <table class="transaction-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Date</th>
+              <th class="text-right">Amount</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="transactionListBody">
+            <!-- Dynamically populated rows -->
+          </tbody>
+        </table>
+
+        <!-- Empty state placeholder -->
+        <div class="table-empty-state" id="tableEmptyState" style="display: none;">
+          <div class="empty-icon">📝</div>
+          <h4>No Transactions Found</h4>
+          <p>Start recording your daily income and expenses above.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
